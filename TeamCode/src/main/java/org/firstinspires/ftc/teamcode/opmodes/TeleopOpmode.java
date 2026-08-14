@@ -9,7 +9,7 @@ import com.seattlesolvers.solverslib.gamepad.GamepadEx;
 import com.seattlesolvers.solverslib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.teamcode.commands.DriveCommand;
-import org.firstinspires.ftc.teamcode.simulator.commnanda.DriveSimCommand;
+import org.firstinspires.ftc.teamcode.simulator.commnands.DriveSimCommand;
 import org.firstinspires.ftc.teamcode.simulator.drivetrains.MecanumDriveSubsystemSimulation;
 import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
