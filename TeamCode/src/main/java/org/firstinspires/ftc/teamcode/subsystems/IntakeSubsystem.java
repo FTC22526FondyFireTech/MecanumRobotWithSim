@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.seattlesolvers.solverslib.command.InstantCommand;
@@ -48,11 +47,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void invertIntake() {
-        if (direction) {
-            direction = false;
-        } else {
-            direction = true;
-        }
+        direction = !direction;
         intakeMotor.setInverted(direction);
     }
 
