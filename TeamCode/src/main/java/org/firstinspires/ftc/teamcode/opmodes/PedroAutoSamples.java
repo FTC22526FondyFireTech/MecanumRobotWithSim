@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.simulator.opmodes.auto;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -15,23 +15,25 @@ import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
 import org.firstinspires.ftc.teamcode.simulator.SimulatorConstants;
 import org.firstinspires.ftc.teamcode.simulator.drivetrains.MecanumDriveSubsystemSimulation;
+import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
+import org.firstinspires.ftc.teamcode.utils.Configurables;
+import org.firstinspires.ftc.teamcode.utils.Constants;
 import org.firstinspires.ftc.teamcode.utils.GlobalData;
 
 /**
-
  * {@link MecanumDriveSubsystemSimulation} instead of real hardware - no robot required.
  * Swap {@link org.firstinspires.ftc.teamcode.utils.Constants#createFollower(com.qualcomm.robotcore.hardware.HardwareMap)}
  * for {@link SimulatorConstants#createSimulatedFollower(MecanumDriveSubsystemSimulation)} and
  * everything else (PathChains, FollowPathCommand, follower.update()/getPose()) works unchanged,
  * since both factories hand back a real {@code Follower}.
  */
-@Autonomous(name = "Pedro Auto Sample (Simulated)", group = "Simulator")
-public class PedroAutoSampleSimulated extends CommandOpMode {
+@Autonomous(name = "Pedro Auto Samples", group = "Auto")
+public class PedroAutoSamples extends CommandOpMode {
+
+    private MecanumDriveSubsystem drive;
     private MecanumDriveSubsystemSimulation driveSim;
     private Follower follower;
     TelemetryManager telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
-
-    // Poses (same as PedroAutoSample, so results are directly comparable to real hardware)
     private final Pose blueStartPose = new Pose(9, 111, Math.toRadians(-90));
     private final Pose blueScorePose = new Pose(16, 128, Math.toRadians(135));
     private final Pose bluePickup1Pose = new Pose(30, 121, Math.toRadians(0));
@@ -83,8 +85,10 @@ public class PedroAutoSampleSimulated extends CommandOpMode {
     public void initialize() {
         super.reset();
 
-
-        driveSim = new MecanumDriveSubsystemSimulation(this);
+        if (!Configurables.doSimulation)
+            drive = new MecanumDriveSubsystem(this.hardwareMap);
+        else
+            driveSim = new MecanumDriveSubsystemSimulation(this);
 
 
         GlobalData.selectStartingConditions(this);
@@ -105,8 +109,14 @@ public class PedroAutoSampleSimulated extends CommandOpMode {
 
         // Only this line differs from PedroAutoSample.initialize() - everything below is
         // identical Follower/PathChain/FollowPathCommand usage.
-        follower = SimulatorConstants.createSimulatedFollower(driveSim);
+
+        if (!Configurables.doSimulation)
+            follower = Constants.createFollower(this.hardwareMap);
+        else
+            follower = SimulatorConstants.createSimulatedFollower(driveSim);
+
         follower.setStartingPose(startPose);
+
         buildPaths();
 
         schedule(
@@ -124,18 +134,18 @@ public class PedroAutoSampleSimulated extends CommandOpMode {
 
     @Override
     public void run() {
-        super.run();
+        while (!isStopRequested() && opModeIsActive()) {
+            run();
 
+            follower.update();
 
-        follower.update();
+            telemetryM.addData("X", follower.getPose().getX());
+            telemetryM.addData("Y", follower.getPose().getY());
+            telemetryM.addData("Heading", Math.toDegrees(follower.getPose().getHeading()));
+            telemetryM.addData("Busy", follower.isBusy());
 
-        telemetryM.addData("X", follower.getPose().getX());
-        telemetryM.addData("Y", follower.getPose().getY());
-        telemetryM.addData("Heading", Math.toDegrees(follower.getPose().getHeading()));
-        telemetryM.addData("Busy", follower.isBusy());
-
-        telemetryM.update(telemetry);
+            telemetryM.update(telemetry);
+        }
     }
-
 
 }

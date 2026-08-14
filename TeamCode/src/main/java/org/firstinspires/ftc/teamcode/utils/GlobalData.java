@@ -64,7 +64,7 @@ public class GlobalData {
     private boolean isAllianceSelected;
 
     //Method to select starting position and number of artifact groupw using gamepad
-    public static void selectStartingPosition(OpMode opMode) {
+    public static void selectStartingConditions(OpMode opMode) {
         opMode.telemetry.setAutoClear(true);
         opMode.telemetry.clearAll();
         allianceSelected = false;

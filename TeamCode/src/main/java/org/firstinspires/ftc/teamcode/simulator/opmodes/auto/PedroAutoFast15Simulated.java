@@ -52,7 +52,7 @@ public class PedroAutoFast15Simulated extends CommandOpMode {
         driveSim = new MecanumDriveSubsystemSimulation(this);
         intake = new IntakeSubsystemSimulate();
         shooter = new ShooterSubsystemSimulate();
-        GlobalData.selectStartingPosition(this);
+        GlobalData.selectStartingConditions(this);
 
 
         f15 = new Fast15();
