@@ -36,13 +36,13 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void runIntake() {
-        if (Configurables.doSimulation)
+        if (!Configurables.doSimulation)
             intakeMotor.set(intakeSpeed);
         else intakeMotorSim.setPower(intakeSpeed);
     }
 
     public void stopIntake() {
-        if (Configurables.doSimulation)
+        if (!Configurables.doSimulation)
             intakeMotor.stopMotor();
         else intakeMotorSim.setPower(0);
     }

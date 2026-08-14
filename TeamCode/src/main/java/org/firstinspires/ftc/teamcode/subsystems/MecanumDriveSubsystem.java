@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
@@ -58,7 +57,7 @@ public class MecanumDriveSubsystem extends SubsystemBase {
         Drawing.drawDebug(follower);
     }
 
-    public void updatetelemetry(TelemetryManager telemetryM){
+    public void showTelemetry(TelemetryManager telemetryM){
         telemetryM.debug("Drive X (in)", follower.getPose().getX());
         telemetryM.debug("Drive Y (in)", follower.getPose().getY());
         telemetryM.debug("Drive Heading (deg)", Math.toDegrees(follower.getPose().getHeading()));

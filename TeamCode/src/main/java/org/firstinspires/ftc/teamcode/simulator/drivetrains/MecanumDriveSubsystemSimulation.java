@@ -185,7 +185,6 @@ public class MecanumDriveSubsystemSimulation extends SubsystemBase {
             telemetryM.addData("TicksPerinch", MotorSimulator.getTicksPerInch());
         }
 
-        telemetryM.update();
     }
 
     /**

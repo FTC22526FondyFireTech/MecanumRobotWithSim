@@ -81,7 +81,7 @@ public class TeleopOpmode extends CommandOpMode {
             if (!Configurables.doSimulation) {
                 drive.setRobotCentric(driverGamepad.getGamepadButton(
                         GamepadKeys.Button.RIGHT_BUMPER).get());
-                drive.updatetelemetry(telemetryM);
+                drive.showTelemetry(telemetryM);
             } else {
                 driveSim.setRobotCentric(driverGamepad.getGamepadButton(
                         GamepadKeys.Button.RIGHT_BUMPER).get());

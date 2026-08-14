@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.simulator.opmodes.auto;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
@@ -14,8 +14,11 @@ import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 
 import org.firstinspires.ftc.teamcode.simulator.SimulatorConstants;
 import org.firstinspires.ftc.teamcode.simulator.drivetrains.MecanumDriveSubsystemSimulation;
-import org.firstinspires.ftc.teamcode.simulator.subsystems.IntakeSubsystemSimulate;
-import org.firstinspires.ftc.teamcode.simulator.subsystems.ShooterSubsystemSimulate;
+import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
+import org.firstinspires.ftc.teamcode.utils.Configurables;
+import org.firstinspires.ftc.teamcode.utils.Constants;
+import org.firstinspires.ftc.teamcode.utils.Fast15;
 import org.firstinspires.ftc.teamcode.utils.GlobalData;
 
 /**
@@ -26,13 +29,15 @@ import org.firstinspires.ftc.teamcode.utils.GlobalData;
  * everything else (PathChains, FollowPathCommand, follower.update()/getPose()) works unchanged,
  * since both factories hand back a real {@code Follower}.
  */
-@Autonomous(name = "Pedro Auto Fast 15 (Simulated)", group = "Simulator")
-public class PedroAutoFast15Simulated extends CommandOpMode {
+@Autonomous(name = "Pedro Auto Fast 15", group = "Auto")
+public class PedroAutoFast15 extends CommandOpMode {
+
+
+    private MecanumDriveSubsystem drive;
     private MecanumDriveSubsystemSimulation driveSim;
 
-    private IntakeSubsystemSimulate intake;
+    private IntakeSubsystem intake;
 
-    private ShooterSubsystemSimulate shooter;
     private Follower follower;
 
     private Fast15 f15;
@@ -47,11 +52,20 @@ public class PedroAutoFast15Simulated extends CommandOpMode {
     @Override
     public void initialize() {
         super.reset();
+        if (!Configurables.doSimulation)
+            drive = new MecanumDriveSubsystem(this.hardwareMap);
+        else
+            driveSim = new MecanumDriveSubsystemSimulation(this);
 
 
-        driveSim = new MecanumDriveSubsystemSimulation(this);
-        intake = new IntakeSubsystemSimulate();
-        shooter = new ShooterSubsystemSimulate();
+        if (!Configurables.doSimulation)
+            follower = Constants.createFollower(this.hardwareMap);
+        else
+            follower = SimulatorConstants.createSimulatedFollower(driveSim);
+
+
+        intake = new IntakeSubsystem(this.hardwareMap);
+
         GlobalData.selectStartingConditions(this);
 
 
@@ -70,59 +84,54 @@ public class PedroAutoFast15Simulated extends CommandOpMode {
                 Commands.sequence(
 
                         new FollowPathCommand(follower, f15.scoreP),
-                        shootCommand(),
-
-                        intakeCommand(f15.intake1P),
+                        new WaitCommand(scoreTime_ms),
+                     //   intakeCommand(f15.intake1P),
 
                         new FollowPathCommand(follower, f15.score1P),
-                        shootCommand(),
-
+                        new WaitCommand(scoreTime_ms),
                         intakeCommand(f15.intake2P),
 
                         new FollowPathCommand(follower, f15.score2P),
-                        shootCommand(),
+                        new WaitCommand(scoreTime_ms),
 
                         intakeCommand(f15.intake3P),
 
                         new FollowPathCommand(follower, f15.score3P),
-                        shootCommand()));
+
+                        new WaitCommand(scoreTime_ms)));
+
     }
 
-    public Command shootCommand() {
-        return Commands.sequence(
-                shooter.runShooterCommand(),
-                new WaitCommand(scoreTime_ms),
-                shooter.stopShooterCommand());
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+
+        initialize();
+        waitForStart();
+
+
+        while (!isStopRequested() && opModeIsActive()) {
+            run();
+            follower.update();
+            telemetryM.addData("Index", seqNum);
+            telemetryM.addData("X", follower.getPose().getX());
+            telemetryM.addData("Y", follower.getPose().getY());
+            telemetryM.addData("Heading", Math.toDegrees(follower.getPose().getHeading()));
+            telemetryM.addData("Busy", follower.isBusy());
+            telemetryM.update(telemetry);
+        }
+
+
     }
 
     public Command intakeCommand(PathChain pc) {
         return
                 Commands.sequence(
 
-                        intake.runIntakeCommand(),
+                        Commands.runOnce(()->intake.runIntake()),
                         new FollowPathCommand(follower, pc),
 
                         new WaitCommand(pickupTime_ms),
                         intake.stopIntakeCommand());
     }
-
-
-    @Override
-    public void run() {
-        super.run();
-        follower.update();
-        telemetryM.addData("Index", seqNum);
-        telemetryM.addData("X", follower.getPose().getX());
-        telemetryM.addData("Y", follower.getPose().getY());
-        telemetryM.addData("Heading", Math.toDegrees(follower.getPose().getHeading()));
-        telemetryM.addData("Busy", follower.isBusy());
-        telemetryM.update(telemetry);
-    }
-
-    //        @Override
-//        public void stop() {
-//            r.saveEnd();
-//            reset();
-//        }
-
 }

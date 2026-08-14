@@ -43,43 +43,9 @@ public class PedroAutoSamples extends CommandOpMode {
 
 
     boolean allianceSelected;
-
     boolean choicesComplete;
     private boolean allianceIsSelected;
 
-    public Pose flipBlueToRedPose(Pose blue) {
-        double x = blue.getX();
-        double y = blue.getY();
-        x = SimulatorConstants.width - x;
-        double h = blue.getHeading();
-        return new Pose(x, y, Math.PI - h);
-    }
-
-    public void buildPaths() {
-        scorePreload = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, scorePose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading())
-                .build();
-
-        grabPickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup1Pose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
-                .build();
-
-        scorePickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup1Pose, scorePose))
-                .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
-                .build();
-
-        park = follower.pathBuilder()
-                .addPath(new BezierCurve(
-                        scorePose,
-                        new Pose(68, 110), // Control point
-                        parkPose)
-                )
-                .setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading())
-                .build();
-    }
 
     @Override
     public void initialize() {
@@ -133,7 +99,11 @@ public class PedroAutoSamples extends CommandOpMode {
     }
 
     @Override
-    public void run() {
+    public void runOpMode() throws InterruptedException {
+
+        initialize();
+        waitForStart();
+
         while (!isStopRequested() && opModeIsActive()) {
             run();
 
@@ -147,5 +117,40 @@ public class PedroAutoSamples extends CommandOpMode {
             telemetryM.update(telemetry);
         }
     }
+
+    public Pose flipBlueToRedPose(Pose blue) {
+        double x = blue.getX();
+        double y = blue.getY();
+        x = SimulatorConstants.width - x;
+        double h = blue.getHeading();
+        return new Pose(x, y, Math.PI - h);
+    }
+
+    public void buildPaths() {
+        scorePreload = follower.pathBuilder()
+                .addPath(new BezierLine(startPose, scorePose))
+                .setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading())
+                .build();
+
+        grabPickup1 = follower.pathBuilder()
+                .addPath(new BezierLine(scorePose, pickup1Pose))
+                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
+                .build();
+
+        scorePickup1 = follower.pathBuilder()
+                .addPath(new BezierLine(pickup1Pose, scorePose))
+                .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
+                .build();
+
+        park = follower.pathBuilder()
+                .addPath(new BezierCurve(
+                        scorePose,
+                        new Pose(68, 110), // Control point
+                        parkPose)
+                )
+                .setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading())
+                .build();
+    }
+
 
 }
