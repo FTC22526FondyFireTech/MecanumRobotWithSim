@@ -66,8 +66,7 @@ public class PedroAutoFast15 extends CommandOpMode {
 
         intake = new IntakeSubsystem(this.hardwareMap);
 
-        GlobalData.selectStartingConditions(this);
-
+        GlobalData.selectAlliance(this);
 
         f15 = new Fast15();
 
@@ -85,7 +84,7 @@ public class PedroAutoFast15 extends CommandOpMode {
 
                         new FollowPathCommand(follower, f15.scoreP),
                         new WaitCommand(scoreTime_ms),
-                     //   intakeCommand(f15.intake1P),
+                        //   intakeCommand(f15.intake1P),
 
                         new FollowPathCommand(follower, f15.score1P),
                         new WaitCommand(scoreTime_ms),
@@ -107,10 +106,10 @@ public class PedroAutoFast15 extends CommandOpMode {
     public void runOpMode() throws InterruptedException {
 
         initialize();
+
         waitForStart();
 
-
-        while (!isStopRequested() && opModeIsActive()) {
+        while (!isStopRequested() && opModeIsActive() && GlobalData.allianceIsConfirmed) {
             run();
             follower.update();
             telemetryM.addData("Index", seqNum);
@@ -120,7 +119,7 @@ public class PedroAutoFast15 extends CommandOpMode {
             telemetryM.addData("Busy", follower.isBusy());
             telemetryM.update(telemetry);
         }
-
+        reset();
 
     }
 
@@ -128,7 +127,7 @@ public class PedroAutoFast15 extends CommandOpMode {
         return
                 Commands.sequence(
 
-                        Commands.runOnce(()->intake.runIntake()),
+                        Commands.runOnce(() -> intake.runIntake()),
                         new FollowPathCommand(follower, pc),
 
                         new WaitCommand(pickupTime_ms),

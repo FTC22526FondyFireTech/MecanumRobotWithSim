@@ -57,7 +57,7 @@ public class PedroAutoSamples extends CommandOpMode {
             driveSim = new MecanumDriveSubsystemSimulation(this);
 
 
-        GlobalData.selectStartingConditions(this);
+        GlobalData.selectAlliance(this);
 
 
         if (GlobalData.isRedAlliance()) {
@@ -104,7 +104,7 @@ public class PedroAutoSamples extends CommandOpMode {
         initialize();
         waitForStart();
 
-        while (!isStopRequested() && opModeIsActive()) {
+        while (!isStopRequested() && opModeIsActive() &&GlobalData.allianceIsConfirmed) {
             run();
 
             follower.update();
@@ -116,6 +116,7 @@ public class PedroAutoSamples extends CommandOpMode {
 
             telemetryM.update(telemetry);
         }
+        reset();
     }
 
     public Pose flipBlueToRedPose(Pose blue) {

@@ -26,8 +26,7 @@ public class GlobalData {
     public static void resetAlliances() {
         blueAlliance = false;
         redAlliance = false;
-        robotLook = new Style("", "#3F51B5", 1.0);
-        ;
+        robotLook = redLook;
     }
 
     public static Command setRedAllianceCommand() {
@@ -57,69 +56,72 @@ public class GlobalData {
     private static final Style blueLook = new Style("", "#0000FF", 1.0);
 
     public static boolean allianceSelected;
-    private static boolean choicesComplete;
+    public static boolean allianceIsConfirmed;
+    public static boolean choicesComplete;
 
-    private static boolean allianceIsSelected;
 
-    private boolean isAllianceSelected;
-
-    //Method to select starting position and number of artifact groupw using gamepad
-    public static void selectStartingConditions(OpMode opMode) {
+    //Method to select starting position and number of artifact group using gamepad
+    public static void selectAlliance(OpMode opMode) {
         opMode.telemetry.setAutoClear(true);
         opMode.telemetry.clearAll();
         allianceSelected = false;
         resetAlliances();
-        choicesComplete = false;
-        allianceIsSelected = false;
+        allianceIsConfirmed = false;
 
-        while (!choicesComplete) {
-            opMode.telemetry.addData("Initializing Autonomous for Team:",
+        while (!allianceIsConfirmed) {
+            opMode.telemetry.addData("Selecting Alliance for Team:",
                     "Fondy Fire Tech", " ", "22526");
-            opMode.telemetry.addData("---------------------------------------", "");
-            opMode.telemetry.addData("Select Alliance using Bumpers on gamepad 1:", "");
+            opMode.telemetry.addLine("---------------------------------------");
+            opMode.telemetry.addData("Select/Change Alliance using Bumpers on Gamepad 1:", "");
             opMode.telemetry.addData("    Blue   ", "Left");
             opMode.telemetry.addData("    Red    ", "Right");
-            opMode.telemetry.addData("Do Not Press Start Unless Alliance Selection Made", "");
+            if (!allianceSelected)
+                opMode.telemetry.addLine("NO Alliance Selected");
+            if (isRedAlliance())
+                opMode.telemetry.addLine("RED Alliance Selected");
+            if (isBlueAlliance())
+                opMode.telemetry.addLine("BLUE Alliance Selected");
+
+
+            opMode.telemetry.addLine();
+
+            opMode.telemetry.addLine("Press Left Trigger ToConfirm Selection and Exit");
+
+
             opMode.telemetry.addLine();
 
             if (opMode.gamepad1.left_bumper) {
-                GlobalData.setBlueAlliance();
-                allianceIsSelected = true;
+                if (!isBlueAlliance()) {
+                    GlobalData.setBlueAlliance();
+                    opMode.telemetry.clear();
+                }
             }
             if (opMode.gamepad1.right_bumper) {
-                GlobalData.setRedAlliance();
-                allianceIsSelected = true;
+                if (!isRedAlliance()) {
+                    GlobalData.setRedAlliance();
+                    opMode.telemetry.clear();
+                }
             }
 
-            allianceSelected = allianceIsSelected && (GlobalData.isRedAlliance() || GlobalData.isBlueAlliance());
+            allianceSelected = GlobalData.isRedAlliance() || GlobalData.isBlueAlliance();
 
-            choicesComplete = allianceSelected;
+            opMode.telemetry.addData("Selected", allianceSelected);
 
-            if (!allianceIsSelected)
-                opMode.telemetry.addData("Alliance ", "not Chosen");
-            if (allianceSelected && GlobalData.isRedAlliance())
-                opMode.telemetry.addData("RED Alliance Selected", "");
-            if (allianceSelected && GlobalData.isBlueAlliance())
-                opMode.telemetry.addData("BLUE Alliance Selected", "");
-            if (allianceSelected)
-                opMode.telemetry.addData("AllianceSelected", allianceSelected);
+            allianceIsConfirmed = allianceSelected && opMode.gamepad1.left_trigger_pressed;
+            opMode.telemetry.addData("Confirmed", allianceIsConfirmed);
 
             opMode.telemetry.update();
-            // sleep(50);
         }
 
         opMode.telemetry.clearAll();
-        if (GlobalData.isRedAlliance())
-            opMode.telemetry.addData("Alliance Selection ", "RED");
-        if (GlobalData.isBlueAlliance())
-            opMode.telemetry.addData("Alliance Selection ", "BLUE");
-        opMode.telemetry.addLine();
+        if (isRedAlliance())
+            opMode.telemetry.addLine("RED Alliance Selected");
+        if (isBlueAlliance())
+            opMode.telemetry.addLine("BLUE Alliance Selected");
 
-        opMode.telemetry.addLine();
-        opMode.telemetry.addData("Restart OpMode ", "to Change");
+        opMode.telemetry.addLine("Alliance Selection Complete");
+        opMode.telemetry.addLine("Stop and Init Opmode to Change");
 
         opMode.telemetry.update();
-
     }
-
 }
