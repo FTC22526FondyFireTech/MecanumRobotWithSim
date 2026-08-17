@@ -14,7 +14,7 @@ public class Configurables {
 
     //Simulation
 
-    public static boolean doSimulation = true;
+    public static boolean doSimulation = false;
 
 
 }
