@@ -43,23 +43,23 @@ public class Constants {
     //public static final String PINPOINT_NAME = "pinpoint";
 
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(3.33) // 7.35 lbs
-            .forwardZeroPowerAcceleration(-45.82809898051445) // Done!
-            .lateralZeroPowerAcceleration(-74.83748364439874) // Done!
-            .translationalPIDFCoefficients(new PIDFCoefficients(
-                    0.11, 0, 0, 0.015
+            .mass(5.48) // 12.1 lbs
+            .forwardZeroPowerAcceleration(-42.91888710774814) // done!
+            .lateralZeroPowerAcceleration(-52.68121433269847) // done!
+            .translationalPIDFCoefficients(new PIDFCoefficients( // done!
+                    0.075, 0, 0.025, 0.025
             ))
             .translationalPIDFSwitch(4) 
             .secondaryTranslationalPIDFCoefficients(new PIDFCoefficients(
                     0.4, 0, 0.005, 0.0006
             ))
-            .headingPIDFCoefficients(new PIDFCoefficients(
-                    0.9, 0, 0, 0.01
+            .headingPIDFCoefficients(new PIDFCoefficients( // done!
+                    1.1, 0, 0.03, 0.04
             ))
             .secondaryHeadingPIDFCoefficients(new PIDFCoefficients(
                     2.5, 0, 0.1, 0.0005
             ))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients( // done!
                     0.1, 0, 0.00035, 0.6, 0.015
             ))
             .secondaryDrivePIDFCoefficients(new FilteredPIDFCoefficients(
@@ -74,12 +74,12 @@ public class Constants {
             .leftRearMotorName(BACK_LEFT_MOTOR_NAME)
             .rightFrontMotorName(FRONT_RIGHT_MOTOR_NAME)
             .rightRearMotorName(BACK_RIGHT_MOTOR_NAME)
-            .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .xVelocity(61.936530270300196) //Done
-            .yVelocity(42.685177522668866); //Done
+            .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .xVelocity(80.73354886035243) // done!
+            .yVelocity(58.54259828825464); // done!
 
     // goBILDA Pinpoint odometry computer configuration.
     // forwardPodY / strafePodX are the offsets (in inches) of the odometry pods from the
@@ -96,17 +96,17 @@ public class Constants {
 
 
     public static ThreeWheelConstants localizerConstantsThreeWheel = new ThreeWheelConstants()
-            .forwardTicksToInches(.002020481592) // Done!
-            .strafeTicksToInches(.002020481592) // Done!
-            .turnTicksToInches(.0020020062226) // Done!
-            .leftPodY(4.5) // Done!
-            .rightPodY(-4.5) // Done!
-            .strafePodX(0.1875) //Done!
-            .leftEncoder_HardwareMapName("leftpod")
-            .rightEncoder_HardwareMapName("rightpod")
-            .strafeEncoder_HardwareMapName("strafepod")
-            .leftEncoderDirection(Encoder.FORWARD)
-            .rightEncoderDirection(Encoder.FORWARD)
+            .forwardTicksToInches(0.0020072738917149015) // done!
+            .strafeTicksToInches(0.002006926335114678) // done!
+            .turnTicksToInches(0.0020082287028496) // done!
+            .leftPodY(6.25) // done!
+            .rightPodY(-6.25) // done!
+            .strafePodX(-6.75) // done!
+            .leftEncoder_HardwareMapName("frontLeft")
+            .rightEncoder_HardwareMapName("backRight")
+            .strafeEncoder_HardwareMapName("backLeft")
+            .leftEncoderDirection(Encoder.REVERSE)
+            .rightEncoderDirection(Encoder.REVERSE)
             .strafeEncoderDirection(Encoder.FORWARD);
 
     /*public static ThreeWheelIMUConstants threeWheelIMUConstants = new ThreeWheelIMUConstants()
@@ -144,14 +144,12 @@ public class Constants {
      * Leave BEZIER_CURVE_SEARCH_LIMIT at 10 unless you know you need to change it.
      */
     public static PathConstraints pathConstraints = new PathConstraints(
-            0.995, 0.1, 0.1, 0.009, 50, 1.25, 10, 1
+            0.995, 0.1, 0.1, 0.009, 50, 0.95, 10, 1
     );
 
     public static Follower createFollower(HardwareMap hardwareMap) {
         return new FollowerBuilder(followerConstants, hardwareMap)
-                //.driveEncoderLocalizer(driveEncoderConstants) uses raw motor encoders
-                //.threeWheelIMULocalizer(threeWheelIMUConstants) uses 3 odometry wheels and imu
-                //  .pinpointLocalizer(localizerConstantsPinpoint) usues pinpoint computer
+                // .pinpointLocalizer(localizerConstantsPinpoint)
                 .pathConstraints(pathConstraints)
                 .mecanumDrivetrain(driveConstants)
                 .threeWheelLocalizer(localizerConstantsThreeWheel) //uses 3 deadwheels

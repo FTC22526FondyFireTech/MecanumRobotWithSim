@@ -2,7 +2,10 @@ package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
+import com.pedropathing.geometry.BezierCurve;
+import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.gamepad.GamepadEx;
@@ -15,6 +18,8 @@ import org.firstinspires.ftc.teamcode.subsystems.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
 import org.firstinspires.ftc.teamcode.utils.Configurables;
 import org.firstinspires.ftc.teamcode.utils.GlobalData;
+import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
+import com.seattlesolvers.solverslib.purepursuit.Path;
 
 //@Autonomous(name = "Blank")
 @TeleOp(name = "Teleop")
@@ -25,10 +30,14 @@ public class TeleopOpmode extends CommandOpMode {
     TelemetryManager telemetryM;
     GamepadEx driverGamepad;
     MecanumDriveSubsystem drive;
-
     private MecanumDriveSubsystemSimulation driveSim;
+    //IntakeSubsystem intake;
 
-    IntakeSubsystem intake;
+    private Pose startPose = new Pose(12, 12, Math.PI / 2);
+
+    private Pose testPose1 = new Pose(36, 12, Math.PI / 2);
+    private Pose testPose2 = new Pose(60, 84, Math.PI / 2);
+    private PathChain testChain1;
 
     @Override
     public void initialize() {
@@ -38,7 +47,7 @@ public class TeleopOpmode extends CommandOpMode {
             drive = new MecanumDriveSubsystem(this.hardwareMap, new Pose());
             drive.setDefaultCommand(new DriveCommand(drive,
                     () -> driverGamepad.getLeftY(),
-                    () -> driverGamepad.getLeftX(),
+                    () -> -driverGamepad.getLeftX(),
                     () -> driverGamepad.getRightX()));
         } else {
             driveSim = new MecanumDriveSubsystemSimulation(this);
@@ -49,16 +58,40 @@ public class TeleopOpmode extends CommandOpMode {
                     () -> driverGamepad.getRightX(), () -> true));
         }
 
-        intake = new IntakeSubsystem(hardwareMap);
+        drive.getFollower().setStartingPose(startPose);
+
+        testChain1 = drive.getFollower().pathBuilder()
+                .addPath(
+                        new BezierLine(
+                                testPose1,
+                                testPose2)
+                )
+                //.setTangentHeadingInterpolation()
+                .build();
+
+        //intake = new IntakeSubsystem(hardwareMap);
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.DPAD_DOWN).whileActiveOnce(GlobalData.toggleAllianceCommand());
 
-        driverGamepad.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
+        driverGamepad.getGamepadButton(GamepadKeys.Button.Y)
+                .whileActiveOnce(drive.resetPoseCommand());
+
+        driverGamepad.getGamepadButton(GamepadKeys.Button.A)
+                .whileActiveOnce(drive.setPoseCommand(new Pose(12,12, Math.PI / 2)));
+
+        driverGamepad.getGamepadButton(GamepadKeys.Button.B)
+                .whileActiveOnce(new FollowPathCommand(drive.getFollower(), testChain1));
+
+
+
+        /*driverGamepad.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenHeld(intake.runIntakeCommand())
                 .whenReleased(intake.stopIntakeCommand());
 
         driverGamepad.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(intake.invertIntakeCommand());
+
+         */
 
 
         telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -88,7 +121,7 @@ public class TeleopOpmode extends CommandOpMode {
                 driveSim.showTelemetry(telemetryM);
             }
 
-            intake.showTelemetry(telemetryM);
+            //intake.showTelemetry(telemetryM);
 
             telemetryM.update(telemetry);
         }

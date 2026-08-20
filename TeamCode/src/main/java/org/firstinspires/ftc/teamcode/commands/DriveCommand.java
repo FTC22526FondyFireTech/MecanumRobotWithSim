@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.commands;
 import com.seattlesolvers.solverslib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.subsystems.MecanumDriveSubsystem;
+import org.firstinspires.ftc.teamcode.utils.GlobalData;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -51,8 +52,16 @@ public class DriveCommand extends CommandBase {
 
     @Override
     public void execute() {
+        if (GlobalData.isRedAlliance()) {
+            drive.drive(forward.getAsDouble(), strafe.getAsDouble(), turn.getAsDouble());
+        } else {
+            drive.drive(-forward.getAsDouble(), -strafe.getAsDouble(), turn.getAsDouble());
+        }
+
+
+
         //  if (fieldCentric.getAsBoolean()) {
-        drive.drive(forward.getAsDouble(), strafe.getAsDouble(), turn.getAsDouble());
+      //  drive.drive(forward.getAsDouble(), strafe.getAsDouble(), turn.getAsDouble());
 //        } else {
 //            drive.driveRobotCentric(forward.getAsDouble(), strafe.getAsDouble(), turn.getAsDouble());
 //        }

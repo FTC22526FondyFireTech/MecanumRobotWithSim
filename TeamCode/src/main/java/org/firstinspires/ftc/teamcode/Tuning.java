@@ -143,8 +143,8 @@ class LocalizationTest extends OpMode {
 
     @Override
     public void init() {
-        Tuning.follower.setStartingPose(new Pose(72,72));
-    }
+        Tuning.follower.setStartingPose(new Pose(0,0));
+    } // 72, 72
 
     /** This initializes the PoseUpdater, the drive motors, and the Panels telemetry. */
     @Override
@@ -214,7 +214,7 @@ class ForwardTuner extends OpMode {
 
     @Override
     public void init() {
-        Tuning.follower.setStartingPose(new Pose(72,72));
+        Tuning.follower.setStartingPose(new Pose(0,0)); //72, 72
         Tuning.follower.update();
         Tuning.drawCurrent();
     }
@@ -262,7 +262,7 @@ class LateralTuner extends OpMode {
 
     @Override
     public void init() {
-        Tuning.follower.setStartingPose(new Pose(72,72));
+        Tuning.follower.setStartingPose(new Pose(0,0)); // 72, 72
         Tuning.follower.update();
         Tuning.drawCurrent();
     }

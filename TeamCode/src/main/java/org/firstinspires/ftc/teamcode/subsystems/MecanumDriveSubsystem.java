@@ -5,10 +5,14 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.seattlesolvers.solverslib.command.Command;
+import com.seattlesolvers.solverslib.command.Commands;
+import com.seattlesolvers.solverslib.command.InstantCommand;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.teamcode.utils.Drawing;
 import org.firstinspires.ftc.teamcode.utils.Constants;
+import org.firstinspires.ftc.teamcode.utils.GlobalData;
 
 /**
  * Mecanum drivebase subsystem.
@@ -54,7 +58,9 @@ public class MecanumDriveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         follower.update();
-        Drawing.drawDebug(follower);
+        //Drawing.drawDebug(follower);
+        Drawing.drawRobot(getPose(), GlobalData.robotLook);
+
     }
 
     public void showTelemetry(TelemetryManager telemetryM){
@@ -80,7 +86,7 @@ public class MecanumDriveSubsystem extends SubsystemBase {
      */
     public void driveRobotCentric(double forward, double strafe, double turn) {
         if (!teleopDriveActive) startTeleopDrive();
-        follower.setTeleOpDrive(forward, strafe, turn, true);
+        follower.setTeleOpDrive(forward, strafe, turn, false);
     }
 
     /**
@@ -130,6 +136,15 @@ public class MecanumDriveSubsystem extends SubsystemBase {
         follower.setPose(pose);
     }
 
+
+    public Command setPoseCommand(Pose pose) {
+        return new InstantCommand(() -> setPose(pose));
+    }
+
+    public Command resetPoseCommand() {
+        return new InstantCommand(() -> setPose(new Pose(0,0,0)));
+    }
+
     /**
      * Escape hatch for building PathChains (follower.pathBuilder()...) outside this class.
      */
@@ -144,11 +159,12 @@ public class MecanumDriveSubsystem extends SubsystemBase {
                       front
              -------------------------
      ^
-   + |             center pod
-     X              (port 1)
-   - |
-     v        left pod       right pod
+   + |         left pod      right pod
               (port 0)        (port 3)
+
+   - |
+     v        strafe pod
+                (port 2)
 
              -------------------------
                       back
@@ -157,7 +173,7 @@ public class MecanumDriveSubsystem extends SubsystemBase {
                       +   -
 
 
-    x length: 14.25 in
-    y length: 17.375 in
-    center: (7.125, 8.6875) (x, y)
+    x length: 17 in
+    y length: 17.25 in
+    center: (8.5, 8.625) (x, y)
  */
