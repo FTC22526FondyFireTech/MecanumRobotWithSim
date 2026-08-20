@@ -26,7 +26,7 @@ public class IntakeSubsystem extends SubsystemBase {
             intakeMotor.setInverted(true); // change to true if initially out-taking
             direction = intakeMotor.getInverted();
         } else {
-            intakeMotorSim = new MotorSimulator(1150);
+            intakeMotorSim = new MotorSimulator(true,1150);
             intakeMotorSim.setInverted(true);
             direction = intakeMotorSim.isInverted();
         }

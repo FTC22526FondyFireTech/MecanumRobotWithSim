@@ -26,43 +26,43 @@ import java.util.function.DoubleSupplier;
  */
 public class DriveSimCommand extends CommandBase {
 
-    private final MecanumDriveSubsystemSimulation drive;
+    private final MecanumDriveSubsystemSimulation driveSim;
     private final DoubleSupplier forward;
     private final DoubleSupplier strafe;
     private final DoubleSupplier turn;
     private final BooleanSupplier fieldCentric;
 
-    public DriveSimCommand(MecanumDriveSubsystemSimulation drive,
+    public DriveSimCommand(MecanumDriveSubsystemSimulation driveSim,
                            DoubleSupplier forward,
                            DoubleSupplier strafe,
                            DoubleSupplier turn,
                            BooleanSupplier fieldCentric
     ) {
-        this.drive = drive;
+        this.driveSim = driveSim;
         this.forward = forward;
         this.strafe = strafe;
         this.turn = turn;
         this.fieldCentric = fieldCentric;
-        addRequirements(drive);
+        addRequirements(driveSim);
     }
 
     @Override
     public void initialize() {
-        drive.startTeleopDrive();
+        driveSim.startTeleopDrive();
     }
 
     @Override
     public void execute() {
         if (GlobalData.isRedAlliance())
-            drive.drive(forward.getAsDouble(), strafe.getAsDouble(), turn.getAsDouble());
+            driveSim.drive(forward.getAsDouble(), strafe.getAsDouble(), turn.getAsDouble());
         else
-            drive.drive(-forward.getAsDouble(), -strafe.getAsDouble(), turn.getAsDouble());
+            driveSim.drive(-forward.getAsDouble(), -strafe.getAsDouble(), turn.getAsDouble());
 
     }
 
     @Override
     public void end(boolean interrupted) {
-        drive.stop();
+        driveSim.stop();
     }
 
     @Override

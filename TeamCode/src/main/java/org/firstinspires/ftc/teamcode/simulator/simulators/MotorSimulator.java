@@ -34,12 +34,13 @@ public class MotorSimulator {
     private double currentPower = 0;
     private long totalEncoderTicks = 0;
 
-    private boolean inverted = false;
+    private boolean inverted;
 
-    public MotorSimulator(double maxRPM) {
+    public MotorSimulator(boolean inverted,double maxRPM) {
         this.currentVelocityRPM = 0;
         this.totalEncoderTicks = 0;
         this.max_RPM = maxRPM;
+        this.inverted=inverted;
     }
 
     /**

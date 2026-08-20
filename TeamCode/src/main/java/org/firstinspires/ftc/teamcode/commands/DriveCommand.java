@@ -29,19 +29,16 @@ public class DriveCommand extends CommandBase {
     private final DoubleSupplier forward;
     private final DoubleSupplier strafe;
     private final DoubleSupplier turn;
-    // private final BooleanSupplier fieldCentric;
 
     public DriveCommand(MecanumDriveSubsystem drive,
                         DoubleSupplier forward,
                         DoubleSupplier strafe,
                         DoubleSupplier turn
-                        //  BooleanSupplier fieldCentric
     ) {
         this.drive = drive;
         this.forward = forward;
         this.strafe = strafe;
         this.turn = turn;
-        // this.fieldCentric = fieldCentric;
         addRequirements(drive);
     }
 
@@ -60,11 +57,6 @@ public class DriveCommand extends CommandBase {
 
 
 
-        //  if (fieldCentric.getAsBoolean()) {
-      //  drive.drive(forward.getAsDouble(), strafe.getAsDouble(), turn.getAsDouble());
-//        } else {
-//            drive.driveRobotCentric(forward.getAsDouble(), strafe.getAsDouble(), turn.getAsDouble());
-//        }
     }
 
     @Override

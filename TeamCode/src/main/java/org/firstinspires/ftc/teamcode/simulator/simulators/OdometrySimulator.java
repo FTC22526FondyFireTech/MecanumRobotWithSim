@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.simulator.simulators;
 
 import com.pedropathing.geometry.Pose;
+import com.seattlesolvers.solverslib.command.Command;
+import com.seattlesolvers.solverslib.command.InstantCommand;
 
 /**
  * Simulates mecanum-wheel + gyro localization (no dead-wheel odometry pods).
@@ -135,6 +137,11 @@ public class OdometrySimulator {
         prevRightRearTicks = backRightMotor.getEncoderTicks();
     }
 
+    public Command resetPoseCommand() {
+        return new InstantCommand(this::resetPose);
+    }
+
+
     /**
      * Set pose to specific values (e.g., after AprilTag correction).
      */
@@ -144,6 +151,11 @@ public class OdometrySimulator {
         poseHeading = heading;
         gyro.setHeadingDegrees(Math.toDegrees(heading));
     }
+
+    public Command setPoseCommand(Pose pose) {
+        return new InstantCommand(() -> setPose(pose.getX(),pose.getY(),pose.getHeading()));
+    }
+
 
     // ---- Getters for telemetry ----
 

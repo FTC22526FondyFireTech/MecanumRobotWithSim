@@ -51,10 +51,10 @@ public class MecanumDriveSubsystemSimulation extends SubsystemBase {
     public MecanumDriveSubsystemSimulation(OpMode opmode) {
         this.opMode = opmode;
 
-        simFL = new MotorSimulator(435);
-        simFR = new MotorSimulator(435);
-        simBL = new MotorSimulator(435);
-        simBR = new MotorSimulator(435);
+        simFL = new MotorSimulator(true, 435);
+        simFR = new MotorSimulator(true, 435);
+        simBL = new MotorSimulator(false, 435);
+        simBR = new MotorSimulator(false, 435);
         gyro = new GyroSimulator();
 
         // Create odometry calculator
@@ -130,7 +130,6 @@ public class MecanumDriveSubsystemSimulation extends SubsystemBase {
             telemetryM.addData("SimY (in)", odometry.getRobotPose().getY());
             telemetryM.addData("SimHeading (deg)", odometry.getRobotPose().getHeading());
 
-
         }
 
         // Motor telemetry
@@ -180,7 +179,7 @@ public class MecanumDriveSubsystemSimulation extends SubsystemBase {
 
         if (Configurables.showDebugTelemetry) {
 
-            telemetryM.addData("TicksPerinch", MotorSimulator.getTicksPerInch());
+            // telemetryM.addData("TicksPerinch", MotorSimulator.getTicksPerInch());
         }
 
     }
@@ -192,7 +191,6 @@ public class MecanumDriveSubsystemSimulation extends SubsystemBase {
      * {@link #driveFieldCentric} if a path-following command just finished.
      */
     public void startTeleopDrive() {
-
         teleopDriveActive = true;
     }
 
@@ -213,32 +211,57 @@ public class MecanumDriveSubsystemSimulation extends SubsystemBase {
     public void drive(double forward, double right, double rotate) {
         // This calculates the power needed for each wheel based on the amount of forward,
         // strafe right, and rotate
-
-        double frontLeftPower = forward + right + rotate;
-        double frontRightPower = forward - right - rotate;
-        double backRightPower = forward + right - rotate;
-        double backLeftPower = forward - right + rotate;
-
-
-        double maxPower = 1.0;
-        double maxSpeed = 1.0;  // make this slower for outreaches
-
-        // This is needed to make sure we don't pass > 1.0 to any wheel
-        // It allows us to keep all the motors in proportion to what they should
-        // be and not get clipped
-        maxPower = Math.max(maxPower, Math.abs(frontLeftPower));
-        maxPower = Math.max(maxPower, Math.abs(frontRightPower));
-        maxPower = Math.max(maxPower, Math.abs(backRightPower));
-        maxPower = Math.max(maxPower, Math.abs(backLeftPower));
+        if (isRobotCentric()) {
+            double frontLeftPower = forward + right + rotate;
+            double frontRightPower = forward - right - rotate;
+            double backRightPower = forward + right - rotate;
+            double backLeftPower = forward - right + rotate;
 
 
-        // We multiply by maxSpeed so that it can be set lower for outreaches
-        // When a young child is driving the robot, we may not want to allow full
-        // speed.
-        simFL.setPower(maxSpeed * (frontLeftPower / maxPower));
-        simFR.setPower(maxSpeed * (frontRightPower / maxPower));
-        simBL.setPower(maxSpeed * (backLeftPower / maxPower));
-        simBR.setPower(maxSpeed * (backRightPower / maxPower));
+            double maxPower = 1.0;
+            double maxSpeed = 1.0;  // make this slower for outreaches
+
+            // This is needed to make sure we don't pass > 1.0 to any wheel
+            // It allows us to keep all the motors in proportion to what they should
+            // be and not get clipped
+            maxPower = Math.max(maxPower, Math.abs(frontLeftPower));
+            maxPower = Math.max(maxPower, Math.abs(frontRightPower));
+            maxPower = Math.max(maxPower, Math.abs(backRightPower));
+            maxPower = Math.max(maxPower, Math.abs(backLeftPower));
+
+
+            // We multiply by maxSpeed so that it can be set lower for outreaches
+            // When a young child is driving the robot, we may not want to allow full
+            // speed.
+            simFL.setPower(maxSpeed * (frontLeftPower / maxPower));
+            simFR.setPower(maxSpeed * (frontRightPower / maxPower));
+            simBL.setPower(maxSpeed * (backLeftPower / maxPower));
+            simBR.setPower(maxSpeed * (backRightPower / maxPower));
+
+        } else {
+            double botHeading = getOdometry().getHeading();
+
+            // Rotate the movement direction counter to the bot's rotation
+            double rotX = right * Math.cos(-botHeading) - forward * Math.sin(-botHeading);
+            double rotY = right * Math.sin(-botHeading) + forward * Math.cos(-botHeading);
+
+            rotX = rotX * 1.1;  // Counteract imperfect strafing
+
+            // Denominator is the largest motor power (absolute value) or 1
+            // This ensures all the powers maintain the same ratio,
+            // but only if at least one is out of the range [-1, 1]
+            double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rotate), 1);
+            double frontLeftPower = (rotY + rotX + rotate) / denominator;
+            double backLeftPower = (rotY - rotX + rotate) / denominator;
+            double frontRightPower = (rotY - rotX - rotate) / denominator;
+            double backRightPower = (rotY + rotX - rotate) / denominator;
+
+            simFL.setPower(frontLeftPower);
+            simBL.setPower(backLeftPower);
+            simFR.setPower(frontRightPower);
+            simBR.setPower(backRightPower);
+        }
+
 
 //        telemetryM.addData("YVEL",simFL.getPower());
 //        telemetryM.update();
